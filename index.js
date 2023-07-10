@@ -21,18 +21,18 @@ app.use(express.json())
 app.use(cors())
 app.use(morganLogger)
 
-app.get('/api/persons', (response, next) => {
+app.get('/api/persons', (response) => {
   Person.find({}).then(persons => {
     return response.json(persons)
-  }).catch(error => next(error))
+  })
 })
 
-app.get('/info', (response, next) => {
+app.get('/info', (response) => {
   Person.find({}).then(persons => {
     const n = persons.length
     const current = new Date()
     response.send(`<p>Phonebook has info for ${n} people<p><p>${current.toDateString()} ${current.toTimeString()}<p>`)
-  }).catch(error => next(error))
+  })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
