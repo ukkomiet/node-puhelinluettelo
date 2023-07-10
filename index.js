@@ -21,42 +21,13 @@ app.use(express.json())
 app.use(cors())
 app.use(morganLogger)
 
-/*
-let persons = [
-    {
-        id: 1,
-        name: "Matti Manninen",
-        number: "0412512" 
-    },
-    {
-      id: 2,
-      name: "Pera Pesukarhu",
-      number: "12345"
-    },
-    {
-      id: 3,
-      name: "Kari Kyttä",
-      number: "112" 
-    },
-    {
-      id: 4,
-      name: "Maestro",
-      number: "020202"
-    },
-    {
-      id: 5,
-      name: "tt",
-      number: "1"
-    }
-  ]*/
-
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (response) => {
   Person.find({}).then(persons => {
     return response.json(persons)
-  }) 
+  })
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (response) => {
   Person.find({}).then(persons => {
     const n = persons.length
     const current = new Date()
@@ -87,8 +58,8 @@ app.get('/api/persons/:id', (request, response, next) => {
   }*/
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  Person.findByIdAndRemove(request.params.id).then(result => {
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id).then(() => {
     return response.status(204).end()
   }).catch(error => next(error))
 })
@@ -111,7 +82,7 @@ app.post('/api/persons', (request, response, next) => {
     number: body.number,
   })
 
-  person.save().then(p => {
+  person.save().then(() => {
     response.json(body)
   }).catch(error => next(error))
 })
@@ -129,7 +100,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
