@@ -24,7 +24,7 @@ app.use(morganLogger)
 app.get('/api/persons', (response) => {
   Person.find({}).then(persons => {
     return response.json(persons)
-  })
+  }).catch(error => next(error))
 })
 
 app.get('/info', (response) => {
@@ -32,7 +32,7 @@ app.get('/info', (response) => {
     const n = persons.length
     const current = new Date()
     response.send(`<p>Phonebook has info for ${n} people<p><p>${current.toDateString()} ${current.toTimeString()}<p>`)
-  })
+  }).catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
