@@ -16,18 +16,18 @@ const morganLogger = morgan(function (tokens, req, res) {
 const cors = require('cors')
 
 const app = express()
-app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 app.use(morganLogger)
+app.use(express.static('build'))
 
-app.get('/api/persons', (response) => {
+app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     return response.json(persons)
   })
 })
 
-app.get('/info', (response) => {
+app.get('/info', (request, response) => {
   Person.find({}).then(persons => {
     const n = persons.length
     const current = new Date()
@@ -59,7 +59,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-  Person.findByIdAndRemove(request.params.id).then(() => {
+  Person.findByIdAndRemove(request.params.id).then(result => {
     return response.status(204).end()
   }).catch(error => next(error))
 })
@@ -82,9 +82,11 @@ app.post('/api/persons', (request, response, next) => {
     number: body.number,
   })
 
-  person.save().then(() => {
+  person.save().then(p => {
     response.json(body)
-  }).catch(error => next(error))
+  }).catch(error => {
+    next(error)
+  })
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -100,8 +102,10 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-const errorHandler = (error, response, next) => {
+const errorHandler = (error, request, response, next) => {
+  console.log('made it to the error handler')
   console.error(error.message)
+  //console.log('made it to the error handler')
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
@@ -111,6 +115,7 @@ const errorHandler = (error, response, next) => {
 
   next(error)
 }
+
 app.use(errorHandler)
 
 
